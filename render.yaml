@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: hediyesepetim-ai-pro
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NILAVIM_XML_URL
+        sync: false
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: PUBLIC_URL
+        sync: false
+      - key: PAYMENT_PROVIDER
+        value: iyzico
+      - key: IYZIPAY_URI
+        value: https://sandbox-api.iyzipay.com
+      - key: IYZIPAY_API_KEY
+        sync: false
+      - key: IYZIPAY_SECRET_KEY
+        sync: false
