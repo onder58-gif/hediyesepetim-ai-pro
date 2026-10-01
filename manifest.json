@@ -1,0 +1,9 @@
+{
+  "name":"HediyeSepetim AI Pro",
+  "short_name":"HediyeSepetim",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#f7f7fb",
+  "theme_color":"#6d28d9",
+  "lang":"tr"
+}

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#6d28d9"><title>HediyeSepetim AI Pro</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f7f7fb;color:#171717}
+header{background:linear-gradient(135deg,#6d28d9,#9333ea);color:white;padding:22px 16px 28px;border-radius:0 0 24px 24px}
+.wrap{max-width:950px;margin:auto;padding:16px}h1{margin:0 0 6px;font-size:25px}.sub{opacity:.9;font-size:14px}
+.search{margin-top:18px;width:100%;padding:13px 15px;border:0;border-radius:14px;font-size:16px}.cats{display:flex;gap:8px;overflow:auto;padding:8px 0 15px}
+.cat{border:0;background:white;padding:10px 14px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px #ddd}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{background:white;border-radius:18px;padding:10px;box-shadow:0 3px 12px #e5e5e5}
+.pic{height:150px;border-radius:14px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:52px;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover}.name{font-weight:bold;margin:10px 0 5px}.price{font-size:18px;font-weight:bold;color:#6d28d9}
+.profit{font-size:12px;color:#16803c;margin-top:4px}.buy{width:100%;border:0;background:#6d28d9;color:white;padding:11px;border-radius:12px;margin-top:9px;font-weight:bold}
+.panel{background:white;margin-top:18px;padding:16px;border-radius:18px}.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #eee}
+.cart{position:fixed;right:16px;bottom:16px;background:#171717;color:white;border:0;border-radius:50px;padding:14px 18px;box-shadow:0 5px 20px #aaa}
+.status{font-size:13px;padding:9px 12px;border-radius:12px;background:#eee;margin:10px 0}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}.pic{height:180px}}
+</style></head>
+<body>
+<header><div class="wrap"><h1>🎁 HediyeSepetim AI Pro</h1>
+<div class="sub">Hediyelik & ev ürünleri</div><input id="search" class="search" placeholder="Ürün ara..." oninput="render()"></div></header>
+<main class="wrap"><div class="cats">
+<button class="cat" onclick="setCat('Tümü')">Tümü</button><button class="cat" onclick="setCat('Hediyelik')">🎁 Hediyelik</button>
+<button class="cat" onclick="setCat('Ev & Yaşam')">🏠 Ev & Yaşam</button><button class="cat" onclick="setCat('Aksesuar')">✨ Aksesuar</button></div>
+<div id="status" class="status">Ürünler yükleniyor...</div><div id="products" class="grid"></div>
+<section class="panel"><h2>⚙️ XML Entegrasyonu</h2>
+<div class="row"><span>Kaynak</span><b>NilaVım XML</b></div>
+<div class="row"><span>Güncelleme</span><b>Sunucu üzerinden</b></div>
+<div class="row"><span>Kâr hesabı</span><b>Otomatik</b></div>
+<p style="font-size:13px;color:#666">XML adresi tarayıcıya gönderilmez; sunucuda tutulur.</p></section></main>
+<button class="cart" onclick="alert('Sepet: '+count+' ürün')">🛒 Sepet <span id="count">0</span></button>
+<script>
+let products=[], cat="Tümü", count=0, cart=[];
+const demo=[{name:"Dekoratif LED Gece Lambası",cat:"Ev & Yaşam",cost:180,price:299,icon:"💡"},
+{name:"Kişiye Özel Hediye Kutusu",cat:"Hediyelik",cost:220,price:399,icon:"🎁"},
+{name:"Masaüstü Mini Organizer",cat:"Ev & Yaşam",cost:120,price:229,icon:"🗂️"},
+{name:"Şık Anahtarlık Seti",cat:"Aksesuar",cost:75,price:159,icon:"🔑"}];
+function setCat(c){cat=c;render()}
+function money(v){return Number(v||0).toLocaleString("tr-TR",{minimumFractionDigits:2,maximumFractionDigits:2})+" TL"}
+function render(){let q=(document.getElementById("search").value||"").toLowerCase();
+let list=products.filter(p=>(cat==="Tümü"||p.cat===cat)&&String(p.name).toLowerCase().includes(q));
+document.getElementById("products").innerHTML=list.map((p,i)=>`<article class="card"><div class="pic">${p.image?`<img src="${p.image}" alt="">`:p.icon||"🎁"}</div>
+<div class="name">${p.name}</div><div class="price">${money(p.price)}</div><div class="profit">Tahmini brüt kâr: ${money((p.price||0)-(p.cost||0))}</div>
+<button class="buy" onclick="add()">Sepete Ekle</button></article>`).join("")||"<p>Ürün bulunamadı.</p>"}
+function add(){
+ let q=(document.getElementById("search").value||"").toLowerCase();
+ let list=products.filter(p=>(cat==="Tümü"||p.cat===cat)&&String(p.name).toLowerCase().includes(q));
+ if(list[0]){cart.push({...list[0],qty:1});count++;document.getElementById("count").textContent=count;showCart()}
+}
+function showCart(){document.getElementById("cartItems").innerHTML=cart.length?cart.map(x=>`<div>${x.name} — ${money(x.price)}</div>`).join("")+"<b>Toplam: "+money(cart.reduce((s,x)=>s+x.price,0))+"</b>":"Sepet boş."}
+async function placeOrder(){
+ if(!cart.length)return alert("Sepet boş.");
+ const customer={name:document.getElementById("cname").value,phone:document.getElementById("cphone").value,address:document.getElementById("caddress").value};
+ const total=cart.reduce((s,x)=>s+x.price,0);
+ const r=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({customer,items:cart,total})});
+ const d=await r.json(); if(!r.ok)return alert(d.error||"Sipariş oluşturulamadı");
+ alert("Siparişiniz oluşturuldu: "+d.orderId);
+const pay=await fetch("/api/payment/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({orderId:d.orderId})});
+if(pay.status===503){alert("Sipariş kaydedildi. Gerçek ödeme hesabı henüz bağlanmadı.");}
+cart=[];count=0;document.getElementById("count").textContent=0;showCart();
+}
+async function load(){try{let r=await fetch("/api/products"); if(!r.ok) throw Error(); let d=await r.json();
+products=d.products||[]; document.getElementById("status").textContent=`XML bağlı • ${products.length} ürün`; render();
+}catch(e){products=demo;document.getElementById("status").textContent="Demo ürünler gösteriliyor • XML sunucusu henüz çalışmıyor";render()}}
+load();
+</script><script>if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js");</script></body></html>
