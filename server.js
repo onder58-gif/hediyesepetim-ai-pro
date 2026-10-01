@@ -15,7 +15,7 @@ function adminAuth(req,res,next){
  if(req.headers.authorization!==`Bearer ${ADMIN_TOKEN}`) return res.status(401).send("Yetkisiz");
  next();
 }
-app.use(express.static(path.join(__dirname,"public")));
+app.use(express.static(__dirname));
 function fileLoad(){try{return JSON.parse(fs.readFileSync(FILE_DB,"utf8"))}catch{return []}}
 function fileSave(x){fs.writeFileSync(FILE_DB,JSON.stringify(x,null,2))}
 async function initDb(){
